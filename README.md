@@ -8,7 +8,7 @@ pizza-toppings is a Kotlin + Spring Boot webserver made out of a desire to learn
 - Docker Desktop
 - Make
 
-## Usage
+## Setup 
 
 ```bash
 # start up the postgres docker container, build and run the app

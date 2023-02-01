@@ -53,7 +53,17 @@ curl --location --request GET 'localhost:8080/toppingVotes'
 ## Features
 ### Sort Topping Vote Summary
 Clients can pass query paramters to choose to sort the topping vote summary alphabetically or by number of votes, ascending or descending.
+```bash
+# Sort by topping name A-Z
+localhost:8080/toppingVotes?sortBy=asc(topping)
+# Sort by topping name Z-A
+localhost:8080/toppingVotes?sortBy=desc(topping)
 
+# Sort by number of votes low to high
+localhost:8080/toppingVotes?sortBy=asc(votes)
+# Sort by number of votes high to low
+localhost:8080/toppingVotes?sortBy=desc(votes)
+```
 ### Postgres Materialized View
 The topping vote summary is powered by a postgres materialized view. In order to keep the response times snappy, the materialzed view is refreshed on a 3000ms schedule. This allows users to submit thier votes without having to wait for the materialized view to refresh.
 

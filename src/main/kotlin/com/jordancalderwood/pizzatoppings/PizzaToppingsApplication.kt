@@ -1,16 +1,16 @@
 package com.jordancalderwood.pizzatoppings
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import java.sql.*
-import org.springframework.scheduling.annotation.EnableScheduling;
+import java.util.*
 
 @Component
 class MaterializedViewRefresher(val db: JdbcTemplate) {
@@ -33,14 +33,24 @@ data class ToppingVote(val topping: String, val votes: Int)
 data class ToppingsSubmission(val email: String, val toppings: Array<String>)
 
 interface IToppingVoteService {
-    fun listToppingVoteSummary(): List<ToppingVote>
+    fun listToppingVoteSummary(sort: String): List<ToppingVote>
     fun submitToppings(toppingsSubmission: ToppingsSubmission)
 }
 
 @Service
 class ToppingVoteService(val db: JdbcTemplate) : IToppingVoteService {
-    override fun listToppingVoteSummary(): List<ToppingVote> = db.query("SELECT * FROM topping_vote_summary") { response, _ ->
-        ToppingVote(response.getString("topping"), response.getInt("votes"))
+    override fun listToppingVoteSummary(sortBy: String): List<ToppingVote> {
+        val orderByClause = when (sortBy.lowercase()) {
+            "desc(topping)" -> " ORDER BY topping DESC"
+            "asc(topping"   -> " ORDER BY topping ASC"
+            "desc(votes)"   -> " ORDER BY votes DESC"
+            "asc(votes)"    -> " ORDER BY votes ASC"
+            else            -> ""
+        }
+        val query = "SELECT * FROM topping_vote_summary$orderByClause"
+        return db.query(query) { response, _ ->
+            ToppingVote(response.getString("topping"), response.getInt("votes"))
+        }
     }
 
     override fun submitToppings(toppingsSubmission: ToppingsSubmission) {
@@ -54,10 +64,9 @@ class ToppingVoteService(val db: JdbcTemplate) : IToppingVoteService {
 @RestController
 class ToppingVoteController(val service: IToppingVoteService) {
     @GetMapping("/toppingVotes")
-    fun listToppingVoteSummary() = service.listToppingVoteSummary()
+    fun listToppingVoteSummary(@RequestParam(name = "sortBy", defaultValue = "desc(votes)") sortBy: String, ) = service.listToppingVoteSummary(sortBy)
 
     @PostMapping("/toppings")
-    fun submitToppings(@RequestBody toppingsSubmission: ToppingsSubmission) {
-        service.submitToppings(toppingsSubmission)
-    }
+    fun submitToppings(@RequestBody toppingsSubmission: ToppingsSubmission) = service.submitToppings(toppingsSubmission)
+
 }

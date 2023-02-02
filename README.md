@@ -14,7 +14,7 @@ pizza-toppings is a Kotlin + Spring Boot webserver made out of a desire to learn
 # start up the postgres docker container, build and run the app
 > make
 
-# after the app is finished building and starting, run load tests
+# after the app is finished building and starting, run load tests in another terminal/shell process
 > make load-tests
 
 # tear down the app, remove postgres volumes (start from scratch)

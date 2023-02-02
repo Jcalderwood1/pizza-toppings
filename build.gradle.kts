@@ -1,4 +1,3 @@
-
 import de.qualersoft.jmeter.gradleplugin.task.JMeterRunTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 

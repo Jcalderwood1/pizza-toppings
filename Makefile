@@ -17,7 +17,7 @@ load-test: start-services
 	./gradlew runJMeter
 
 .PHONY: test
-test:
+test: start-services
 	./gradlew test
 
 .PHONY: clean

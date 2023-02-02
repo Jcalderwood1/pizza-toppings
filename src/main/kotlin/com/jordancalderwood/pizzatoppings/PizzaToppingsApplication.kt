@@ -31,19 +31,20 @@ fun main(args: Array<String>) {
 
 data class ToppingVote(val topping: String, val votes: Int)
 data class ToppingsSubmission(val email: String, val toppings: Array<String>)
+typealias ToppingVoteSummary = List<ToppingVote>
 
 interface IToppingVoteService {
-    fun listToppingVoteSummary(sort: String): List<ToppingVote>
+    fun listToppingVoteSummary(sortBy: String): ToppingVoteSummary
     fun submitToppings(toppingsSubmission: ToppingsSubmission)
     fun getToppingsByEmail(email: String) : ToppingsSubmission?
 }
 
 @Service
 class ToppingVoteService(val db: JdbcTemplate) : IToppingVoteService {
-    override fun listToppingVoteSummary(sortBy: String): List<ToppingVote> {
+    override fun listToppingVoteSummary(sortBy: String): ToppingVoteSummary {
         val orderByClause = when (sortBy.lowercase()) {
             "desc(topping)" -> " ORDER BY topping DESC"
-            "asc(topping"   -> " ORDER BY topping ASC"
+            "asc(topping)"   -> " ORDER BY topping ASC"
             "desc(votes)"   -> " ORDER BY votes DESC"
             "asc(votes)"    -> " ORDER BY votes ASC"
             else            -> ""
@@ -82,7 +83,7 @@ class ToppingVoteService(val db: JdbcTemplate) : IToppingVoteService {
 @RestController
 class ToppingVoteController(val service: IToppingVoteService) {
     @GetMapping("/toppingVotes")
-    fun listToppingVoteSummary(@RequestParam(name = "sortBy", defaultValue = "desc(votes)") sortBy: String, ) = service.listToppingVoteSummary(sortBy)
+    fun listToppingVoteSummary(@RequestParam(name = "sortBy", defaultValue = "desc(votes)") sortBy: String ) = service.listToppingVoteSummary(sortBy)
 
     @GetMapping("/toppings/{email}")
     fun getToppingsByEmail(@PathVariable email: String) = service.getToppingsByEmail(email)

@@ -35,6 +35,7 @@ data class ToppingsSubmission(val email: String, val toppings: Array<String>)
 interface IToppingVoteService {
     fun listToppingVoteSummary(sort: String): List<ToppingVote>
     fun submitToppings(toppingsSubmission: ToppingsSubmission)
+    fun getToppingsByEmail(email: String) : ToppingsSubmission?
 }
 
 @Service
@@ -59,6 +60,23 @@ class ToppingVoteService(val db: JdbcTemplate) : IToppingVoteService {
             toppingsSubmission.email, toppingsSubmission.toppings
         )
     }
+    val jordanToppings = arrayOf("buffalo mozzarella", "crushed tomato sauce", "fresh basil", "fennel sausage")
+    override fun getToppingsByEmail(email: String) : ToppingsSubmission? {
+        if (email == "jordan@email.com") {
+            return ToppingsSubmission("jordan@email.com", jordanToppings)
+        }
+        val query = "SELECT * FROM submissions WHERE email ILIKE ?"
+        return db.query(
+            query,
+            { response, _  ->
+                ToppingsSubmission(
+                    response.getString("email"),
+                    response.getArray("toppings").array as Array<String>
+                )
+            },
+            email
+        ).firstOrNull()
+    }
 }
 
 @RestController
@@ -66,7 +84,9 @@ class ToppingVoteController(val service: IToppingVoteService) {
     @GetMapping("/toppingVotes")
     fun listToppingVoteSummary(@RequestParam(name = "sortBy", defaultValue = "desc(votes)") sortBy: String, ) = service.listToppingVoteSummary(sortBy)
 
+    @GetMapping("/toppings/{email}")
+    fun getToppingsByEmail(@PathVariable email: String) = service.getToppingsByEmail(email)
+
     @PostMapping("/toppings")
     fun submitToppings(@RequestBody toppingsSubmission: ToppingsSubmission) = service.submitToppings(toppingsSubmission)
-
 }

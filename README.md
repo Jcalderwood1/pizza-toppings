@@ -2,11 +2,12 @@
 
 pizza-toppings is a Kotlin + Spring Boot webserver made out of a desire to learn about Kotlin and the state of web development on the JVM.
 
+---
 ## Prerequisites
-
 - Java 17
 - Docker Desktop
 - Make
+---
 
 ## Setup 
 
@@ -20,7 +21,7 @@ pizza-toppings is a Kotlin + Spring Boot webserver made out of a desire to learn
 # tear down the app, remove postgres volumes (start from scratch)
 > make clean
 ```
-
+---
 ## API
 ### Submit pizza toppings you are interested in:
 ```bash
@@ -47,6 +48,12 @@ curl --location --request GET 'localhost:8080/toppingVotes'
    ...
 ]
 ```
+### Get a topping submission by email
+#### *Try querying for "jordan@email.com" for a list of my favorite toppings
+```bash
+curl --location --request GET 'localhost:8080/toppings/foo@bar.com'
+```
+---
 ## Features
 ### Sort Topping Vote Summary
 Clients can pass query paramters to choose to sort the topping vote summary alphabetically or by number of votes, ascending or descending.
@@ -73,8 +80,7 @@ summary = 40841 in 00:00:24 = 1673.8/s Avg: 116 Min:   2 Max: 378 Err: 0
 summary + 39159 in 00:00:24 = 1661.5/s Avg: 118 Min:   1 Max: 392 Err: 0
 summary = 80000 in 00:00:48 = 1667.7/s Avg: 117 Min:   1 Max: 392 Err: 0
 ```
-
-
+---
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
